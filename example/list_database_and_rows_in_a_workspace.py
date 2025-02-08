@@ -1,18 +1,25 @@
-import os
+from os import environ
 import requests
 
 if __name__ == "__main__":
-  access_token = os.environ['APPFLOWY_ACCESS_TOKEN']
+  access_token = environ['APPFLOWY_ACCESS_TOKEN']
   headers = {"Authorization": f"Bearer {access_token}"}
-  base_url = os.environ['APPFLOWY_API_BASE_URL']
+  try:
+    base_url = environ['APPFLOWY_BASE_URL']
+  except:
+    base_url = "https://beta.appflowy.cloud"
   # List all workspaces which the access token has access to
   resp = requests.get(
     f"{base_url}/api/workspace",
     headers=headers).json()
+  try:
+    workspace_name = environ['APPFLOWY_WORKSPACE']
+  except:
+    workspace_name = "My Workspace"
   workspace_id = [
     workspace["workspace_id"]
     for workspace in resp["data"]
-    if workspace["workspace_name"] == os.environ['APPFLOWY_WORKSPACE']
+    if workspace["workspace_name"] == workspace_name
     ][0]
   # List all databases in the workspace
   resp = requests.get(
