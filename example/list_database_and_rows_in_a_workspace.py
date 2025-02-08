@@ -27,15 +27,12 @@ if __name__ == "__main__":
   resp = requests.get(
     f"{base_url}/api/workspace/{workspace_id}/database/{database_id}/row",
     headers=headers).json()
-  # print(resp)
   row_ids = [row["id"] for row in resp["data"]]
-  # print(row_ids)
   # List all row details in the database given the row ids
   resp = requests.get(
     f"{base_url}/api/workspace/{workspace_id}/database/{database_id}/row/detail",
     params={"ids": ",".join(row_ids)},
     headers=headers).json()
-  # print(resp.text)
   # List all row updated since timestamp in the database
   resp = requests.get(
     f"{base_url}/api/workspace/{workspace_id}/database/{database_id}/row/updated",
