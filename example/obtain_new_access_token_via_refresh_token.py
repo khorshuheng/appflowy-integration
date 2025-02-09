@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from os import environ
 import requests
 
 class TokenStorage(ABC):
@@ -16,10 +17,11 @@ class TokenStorage(ABC):
     raise NotImplementedError
 
   def get_access_token(self) -> str:
+    print("Gave: " + self.get_refresh_token())
     resp = requests.post(
       f"{self.base_url}/gotrue/token?grant_type=refresh_token",
       json = {
-        "refresh_token": self.get_refresh_token,
+        "refresh_token": self.get_refresh_token(),
       })
     refresh_token = resp.json()["refresh_token"]
     self.store_refresh_token(refresh_token)
@@ -39,6 +41,10 @@ class InMemoryRefreshTokenStorage(TokenStorage):
     self.refresh_token = refresh_token
 
 if __name__ == "__main__":
-  base_url = "https://beta.appflowy.cloud"
-  storage = InMemoryRefreshTokenStorage(base_url, "your initial refresh token")
+  try:
+    base_url = environ['APPFLOWY_BASE_URL']
+  except:
+    base_url = "https://beta.appflowy.cloud"
+  storage = InMemoryRefreshTokenStorage(base_url, environ['APPFLOWY_REFRESH_TOKEN'])
   access_token = storage.get_access_token()
+  print("Got:  " + access_token)
